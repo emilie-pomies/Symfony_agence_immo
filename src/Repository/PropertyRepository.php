@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Property;
+use App\Entity\PropertySearch;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 
 /**
  * @method Property|null find($id, $lockMode = null, $lockVersion = null)
@@ -20,22 +22,44 @@ class PropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, Property::class);
     }
 
-    private function findVisibleQuery():QueryBuilder
-    {
-        return $this->createQueryBuilder('p')
-        ->where('p.sold = false');
-    }
+    
 
     /**
-     * @return Property[]
+     * @return Query
      */
 
-    public function findAllVisible()
+    public function findAllVisibleQuery(PropertySearch $search): Query
     {
-        return $this->findVisibleQuery()
-            ->getQuery()
-            ->getResult()
-        ;
+        $query = $this->findVisibleQuery();
+
+        if($search->getMaxPrice())
+        {
+            $query = $query
+                ->andWhere('p.price <= :maxprice')
+                ->setParameter('maxPrice', $search->getMaxPrice());
+        }
+
+        if($search->getMinSurface())
+        {
+            $query = $query
+                ->andWhere('p.surface >= :minsurface')
+                ->setParameter('minsurface', $search->getMinSurface());
+        }
+
+        if($search->getOptions()->count() > 0 )
+        {
+            $k = 0;
+            foreach($search->getOptions() as $option){
+                $k++;
+                $query = $query
+                ->andWhere(":option$k MEMBER OF p.options")
+                ->setParameter(":option$k", $option);
+            }
+        }
+
+
+        return $query->getQuery();
+        
     }
 
     /**
@@ -49,6 +73,13 @@ class PropertyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+
+    private function findVisibleQuery():QueryBuilder
+    {
+        return $this->createQueryBuilder('p')
+        ->where('p.sold = false');
     }
 
     // /**

@@ -4,7 +4,7 @@ security:
     providers:
         from_database:
             entity:
-                class: App\entity\User
+                class: App\Entity\User
                 property: username
 
     firewalls:

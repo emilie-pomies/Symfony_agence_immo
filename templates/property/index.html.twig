@@ -2,29 +2,43 @@
 {% block title 'Gérer les biens' %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Gérer les biens</h1>
 
-    <div class="table table-striped">
+	<div class="jumbotron">
+		<div class="container">
+			{{form_start(form)}}
+			<div class="form-row align-items-end ">
+				<div class="col">
+					{{form_row(form.minSurface)}}
+				</div>
+				<div class="col">
+					{{form_row(form.maxPrice)}}
+				</div>
+				<div class="col">
+					{{form_row(form.options)}}
+				</div>
+				<div class="col">
+					<div class="form-group">
+						<button class="btn btn-info">Rechercher</button>
+					</div>
+				</div>
+			</div>
+			{{form_end(form)}}
+		</div>
+	</div>
+	<div class="container mt-4">
+		<h1>Gérer les biens</h1>
 
-        <thead>
-            <tr>
-                <th>Titre</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for property in properties %}
-            <tr>
-                <td>{{property.title}}</td>
-                <td>
-                    <a href="{{ path:('admin.property.edit', {id: property.id})}}" class="btn btn-secondary">Editer</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </div>
-</div>
+		<div class="row">
+			{% for property in properties %}
+				<div class="col-md-4">
+					{% include 'property/_property.html.twig' %}
+				</div>
+			{% endfor %}
+		</div>
+		<div class="navigation">
+			{{ knp_pagination_render(properties) }}
+		</div>
+	</div>
 
 
 {% endblock body %}

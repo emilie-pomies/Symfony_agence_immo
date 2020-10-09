@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+
 use Serializable;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
@@ -59,7 +60,7 @@ class User implements UserInterface, Serializable
     }
 
     public function getRoles(){
-        return ['ROLE_ADMIN'];
+        return ["ROLE_ADMIN"];
     }
 
     public function getSalt(){
@@ -71,7 +72,7 @@ class User implements UserInterface, Serializable
     }
 
     public function serialize(){
-        return $this->serialize([
+        return serialize([
             $this->id,
             $this->username,
             $this->password
@@ -84,6 +85,6 @@ class User implements UserInterface, Serializable
             $this->id,
             $this->username,
             $this->password
-        ) = unserialize($serialized, ['allowed classes' => false]);
+        ) = unserialize($serialized, ["allowed classes" => false]);
     }
 }

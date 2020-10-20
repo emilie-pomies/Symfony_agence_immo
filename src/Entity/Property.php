@@ -2,17 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\PropertyRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use Cocur\Slugify\Slugify;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PropertyRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @ORM\Entity(repositoryClass=PropertyRepository::class)
- *  @UniqueEntity("title")
+ * @UniqueEntity("title")
+ * @Vich\Uploadable
  */
 class Property
 {
@@ -29,6 +33,22 @@ class Property
      */
     private $id;
 
+      /**
+     * @ORM\Column(type="string", length=255)
+     * @var string|null
+     */
+    private $fileName;
+
+    /**
+     * 
+     * @var File|null
+     * @Vich\UploadableField(mapping="property_image", fileNameProperty="fileName")
+     * @Assert\Image(
+     *              mimeTypes="image/jpeg"
+     * )
+     */
+    private $imageFile;
+    
     /**
      * @Assert\Length(min=5, max=255)
      * @ORM\Column(type="string", length=255)
@@ -101,6 +121,13 @@ class Property
      * @ORM\ManyToMany(targetEntity=Option::class, inversedBy="properties")
      */
     private $options;
+
+    /**
+    * @ORM\Column(type="datetime")
+    *
+    * @var \DateTimeInterface|null
+    */
+    private $updated_at;
 
     public function __construct()
     {
@@ -307,6 +334,68 @@ class Property
             $this->options->removeElement($option);
             $option->removeProperty($this);
         }
+
+        return $this;
+    }
+
+   
+
+    /**
+     * Get the value of fileName
+     *
+     * @return  string|null
+     */ 
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * Set the value of fileName
+     *
+     * @param  string|null  $fileName
+     * @return  Property
+     */ 
+    public function setFileName($fileName) : Property
+    {
+        $this->fileName = $fileName;
+        return $this;
+    }
+
+    /**
+     * Get the value of imageFile
+     *
+     * @return  File|null
+     */ 
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * Set the value of imageFile
+     *
+     * @param  File|null  $imageFile
+     * @return  Property
+     */ 
+    public function setImageFile($imageFile = null) 
+    {
+        $this->imageFile = $imageFile;
+        if ($this->imageFile instanceof UploadedFile) {
+            $this->updated_at = new \DateTime('now');
+
+        return $this;
+        }
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }

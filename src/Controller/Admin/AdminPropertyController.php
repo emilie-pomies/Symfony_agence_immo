@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AdminPropertyController extends AbstractController{
 
@@ -78,8 +79,10 @@ class AdminPropertyController extends AbstractController{
         
         $form = $this->createForm(PropertyType::class, $property);
         $form->handleRequest($request);
-        
+
+               
         if($form->isSubmitted() && $form->isValid()){
+
             $em = $this->getDoctrine()->getManager();
             $em->flush();
             $this->addFlash('success', 'Modifié avec succès!');
